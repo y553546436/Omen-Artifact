@@ -1,0 +1,32 @@
+#ifndef HDC_H
+#define HDC_H
+
+#define REAL
+
+#define NUMFEATURE $num_feature
+#define NUMDIM $num_dim
+#define NUMCLASS $num_class
+#define NUMTEST $num_test
+#define BUFFER_SIZE NUMFEATURE * sizeof(float)
+
+#ifndef FREQ
+#define FREQ 5
+#endif
+
+#define __ceildiv(a, b) (((a) + (b) - 1) / (b))
+
+const $hv_type GAUSSIAN[NUMFEATURE][NUMDIM] = $gaussian_data;
+
+const $hv_type OFFSET[NUMDIM] = $offset_data;
+
+const $hv_type CLASS[NUMCLASS][NUMDIM] = $class_hv_data;
+
+#ifdef REAL
+const $hv_type THRESHOLD[NUMCLASS - 1] = $threshold_data;
+#else
+const $hv_type THRESHOLD[NUMDIM/FREQ][NUMCLASS - 1] = $threshold_data;
+#endif
+
+extern float TEST_FEATURE[NUMFEATURE];
+
+#endif // HDC_H

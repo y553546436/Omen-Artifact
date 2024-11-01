@@ -1,0 +1,23 @@
+src/data
+__pycache__
+output
+*.pkl
+*.npy
+*.pth
+*.csv
+
+data-*
+output-*
+
+UCI HAR Dataset/
+
+bin/
+build/
+
+model.h
+
+ldc_model.h
+testdata.h
+
+# Mac OS
+*.DS_Store

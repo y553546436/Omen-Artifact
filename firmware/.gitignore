@@ -1,0 +1,8 @@
+# For STM32CubeIDE
+
+.settings/
+
+# Build results
+
+[Dd]ebug/
+[Rr]elease/

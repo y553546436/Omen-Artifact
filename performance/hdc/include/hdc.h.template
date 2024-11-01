@@ -1,0 +1,53 @@
+#ifndef HDC_H
+#define HDC_H
+
+#include <stdint.h>
+
+#define $data_type
+
+#define NUMFEATURE $num_feature
+#define BUFFER_SIZE NUMFEATURE * sizeof(float)
+#define NUMCLASS $num_class
+#define NUMDIM $num_dim
+
+#ifndef FREQ
+#define FREQ $freq
+#endif
+#ifndef START
+#define START $start
+#endif
+
+extern float TEST_FEATURE[NUMFEATURE];
+
+#define __ceildiv(a, b) (((a) + (b) - 1) / (b))
+
+const double THRESHOLD[NUMCLASS - 1] = $threshold_data;
+#ifdef BINARY
+const int DIFF2[NUMCLASS][__ceildiv(NUMDIM, FREQ)][NUMCLASS] = $diff2_data;
+const uint64_t CLASS[NUMDIM][NUMCLASS] = $class_hv_data;
+#ifdef LANGUAGE
+#define NUMCHAR $num_char
+const uint64_t CHAR_CODEBOOK[NUMCHAR][NUMDIM] = $char_codebook_data;
+const int CHAR_MAP[NUMCHAR] = $char_map_data;
+#else
+#define MIN_VAL $min_val
+#define MAX_VAL $max_val
+#define LEVELS $levels
+const uint64_t CODEBOOK[LEVELS+2][NUMDIM] = $codebook_data;
+const uint64_t BASIS[NUMFEATURE][NUMDIM] = $basis_data;
+#endif
+#else
+const double CLASS[NUMDIM][NUMCLASS] = $class_hv_data;
+const double GAUSSIAN[NUMFEATURE][NUMDIM] = $gaussian_data;
+const double OFFSET[NUMDIM] = $offset_data;
+#endif
+
+// for other strategies
+#ifdef REAL
+const double CLASS_SQUARED_SUM[__ceildiv(NUMDIM, FREQ)][NUMCLASS] = $class_squared_sum_data;
+#endif
+#define DIFF_THRESHOLD $diff_threshold
+#define ABSOLUTE_THRESHOLD $absolute_threshold
+const double MEAN_THRESHOLD[NUMCLASS] = $mean_thresholds;
+
+#endif // HDC_H

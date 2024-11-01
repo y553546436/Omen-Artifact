@@ -1,0 +1,31 @@
+#ifndef HDC_H
+#define HDC_H
+
+#define REAL
+
+#define NUMFEATURE 768
+#define NUMDIM 10000
+#define NUMCLASS 10
+#define NUMTEST 1000
+
+#ifndef FREQ
+#define FREQ 64
+#endif
+
+#define __ceildiv(a, b) (((a) + (b) - 1) / (b))
+
+const double GAUSSIAN[NUMFEATURE][NUMDIM] = {{0}};
+
+const double TEST_FEATURE[1000][NUMFEATURE] = {{0}};
+
+const double OFFSET[NUMDIM] = {0};
+
+const double CLASS[NUMCLASS][NUMDIM] = {{0}};
+
+const int STOPPOINT[NUMTEST] = {0};
+
+const int CAND[NUMTEST][__ceildiv(NUMDIM, FREQ)] = {{0}};
+
+const double THRESHOLD[NUMCLASS - 1] = {0};
+
+#endif // HDC_H

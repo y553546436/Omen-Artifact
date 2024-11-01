@@ -1,0 +1,10 @@
+numpy
+onlinehd
+pandas
+Requests
+scikit_learn
+torch
+tqdm
+rich
+pyserial
+matplotlib
