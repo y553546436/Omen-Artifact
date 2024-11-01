@@ -477,28 +477,43 @@ void mean_strategy(uint32_t *result) {
     }
 }
 
-#include <pthread.h>
-#include <sched.h>
-#include <unistd.h>
-#include <cstdint>
+#if defined(__linux__) || defined(__linux)
+    #include <pthread.h>
+    #include <sched.h>
+    #include <unistd.h>
+    #include <cstdint>
 
-void set_affinity(int cpu_id) {
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(cpu_id, &cpuset);
+    void set_affinity(int cpu_id) {
+        cpu_set_t cpuset;
+        CPU_ZERO(&cpuset);
+        CPU_SET(cpu_id, &cpuset);
 
-    pthread_t current_thread = pthread_self();
-    if (pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset) != 0) {
-        perror("pthread_setaffinity_np");
+        pthread_t current_thread = pthread_self();
+        if (pthread_setaffinity_np(current_thread, sizeof(cpu_set_t), &cpuset) != 0) {
+            perror("pthread_setaffinity_np");
+        }
     }
-}
+#elif defined(__APPLE__) || defined(__MACH__)
+    #include <pthread.h>
+    #include <mach/thread_policy.h>
+    #include <mach/thread_act.h>
+
+    void set_affinity(int cpu_id) {
+        thread_affinity_policy_data_t policy = { cpu_id };
+        thread_port_t mach_thread = pthread_mach_thread_np(pthread_self());
+        thread_policy_set(mach_thread, THREAD_AFFINITY_POLICY,
+                         (thread_policy_t)&policy, THREAD_AFFINITY_POLICY_COUNT);
+    }
+#else
+    #error "Platform not supported. This code only works on Linux and macOS."
+#endif
 
 float TEST_FEATURE[NUMFEATURE] = {0};
 
 // performance evaluation
 void evaluate() {
     // each row is the result of a test
-    uint32_t results[DATA_NUMTEST][14] = {0};
+    uint32_t results[DATA_NUMTEST][14] = {{0}};
     // test loop
     for (int test_no = 0; test_no < DATA_NUMTEST; test_no++) {
 #ifdef LANGUAGE

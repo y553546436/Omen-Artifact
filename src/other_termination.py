@@ -16,14 +16,10 @@ def batch_get_sum_dists(enc_x, y, class_hvs, binary):
     n, dim = enc_x.shape
     classes = class_hvs.shape[0]
     dists = get_dists(enc_x, class_hvs, binary)
-    y_pred = torch.argmin(dists, dim=0)
-    # mask is a (classes, n) matrix, where mask[i, j] = 1 if y[j] == i (sample j is in class i), otherwise 0
     mask = y.unsqueeze(0) == torch.arange(classes, device=y.device).unsqueeze(1)
-    # correct_mask is a (classes, n) matrix, where correct_mask[i, j] = 1 if y[j] == i (sample j is in class i) and y_pred[j] == i (sample j is classified as class i), otherwise 0
-    correct_mask = mask & (y.unsqueeze(0) == y_pred.unsqueeze(0))
-    correct_dists = dists * correct_mask.int().float()
-    incorrect_dists = dists * (mask.int() - correct_mask.int()).float()
-    return correct_mask, correct_dists.sum(dim=1), torch.square(correct_dists).sum(dim=1), incorrect_dists.sum(dim=1), torch.square(incorrect_dists).sum(dim=1)
+    in_class_dists = dists * mask.int().float()
+    out_class_dists = dists * (1 - mask.int()).float()
+    return in_class_dists.sum(dim=1), torch.square(in_class_dists).sum(dim=1), out_class_dists.sum(dim=1), torch.square(out_class_dists).sum(dim=1)
 
 
 # threshold for class t is calculated as the mean of (1) mean+std of distances from training samples in class t to class hypervector t, and (2) mean-std of distances from the training samples not in class t to class hypervector t, where std is the standard deviation.
@@ -35,25 +31,24 @@ def get_mean_thresholds(enc_x, y, class_hvs, binary):
     mask = y.unsqueeze(0) == torch.arange(classes, device=y.device).unsqueeze(1)
     # print(f'mask: {mask}')
     # mask shape (classes, n)
-    correct_dists = torch.zeros(classes, device=enc_x.device)
-    correct_sq_dists = torch.zeros(classes, device=enc_x.device)
-    incorrect_dists = torch.zeros(classes, device=enc_x.device)
-    incorrect_sq_dists = torch.zeros(classes, device=enc_x.device)
+    in_class_dists = torch.zeros(classes, device=enc_x.device)
+    in_class_sq_dists = torch.zeros(classes, device=enc_x.device)
+    out_class_dists = torch.zeros(classes, device=enc_x.device)
+    out_class_sq_dists = torch.zeros(classes, device=enc_x.device)
     batch_size = 1000
-    correct_mask_list = []
     for i in range(0, n, batch_size):
-        correct_mask_batch, correct_dists_batch, correct_sq_dists_batch, incorrect_dists_batch, incorrect_sq_dists_batch = batch_get_sum_dists(enc_x[i:i+batch_size], y[i:i+batch_size], class_hvs, binary)
-        correct_dists += correct_dists_batch.to(correct_dists.device)
-        correct_sq_dists += correct_sq_dists_batch.to(correct_dists.device)
-        incorrect_dists += incorrect_dists_batch.to(correct_dists.device)
-        incorrect_sq_dists += incorrect_sq_dists_batch.to(correct_dists.device)
-        correct_mask_list.append(correct_mask_batch)
-    correct_mask = torch.cat(correct_mask_list, dim=1)
-    correct_mean = correct_dists / correct_mask.sum(dim=1).float()
-    correct_std = torch.sqrt(correct_sq_dists / correct_mask.sum(dim=1).float() - torch.square(correct_mean))
-    incorrect_mean = incorrect_dists / (mask.sum(dim=1) - correct_mask.sum(dim=1)).float()
-    incorrect_std = torch.sqrt(incorrect_sq_dists / (mask.sum(dim=1) - correct_mask.sum(dim=1)).float() - torch.square(incorrect_mean))
-    thresholds = (correct_mean + correct_std + incorrect_mean - incorrect_std) / 2
+        in_class_dists_batch, in_class_sq_dists_batch, out_class_dists_batch, out_class_sq_dists_batch = batch_get_sum_dists(enc_x[i:i+batch_size], y[i:i+batch_size], class_hvs, binary)
+        in_class_dists += in_class_dists_batch.to(in_class_dists.device)
+        in_class_sq_dists += in_class_sq_dists_batch.to(in_class_dists.device)
+        out_class_dists += out_class_dists_batch.to(in_class_dists.device)
+        out_class_sq_dists += out_class_sq_dists_batch.to(in_class_dists.device)
+    in_class_mean = in_class_dists / mask.sum(dim=1).float()
+    in_class_std = torch.sqrt(in_class_sq_dists / mask.sum(dim=1).float() - torch.square(in_class_mean))
+    # print(f'in_class_mean: {in_class_mean}')
+    out_class_mean = out_class_dists / (n - mask.sum(dim=1)).float()
+    out_class_std = torch.sqrt(out_class_sq_dists / (n - mask.sum(dim=1)).float() - torch.square(out_class_mean))
+    # print(f'out_class_mean: {out_class_mean}')
+    thresholds = (in_class_mean + in_class_std + out_class_mean - out_class_std) / 2
     return thresholds.cpu().numpy()
 
 
