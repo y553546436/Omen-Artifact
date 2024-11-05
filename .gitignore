@@ -1,6 +1,7 @@
 src/data
 __pycache__
 output
+mcu-output
 *.pkl
 *.npy
 *.pth

@@ -9,7 +9,7 @@ Docker installation instructions can be found [here](https://docs.docker.com/get
 To build the Docker image, run `docker build -t artifact .` in the top directory of this repository.
 
 ## [Optional] Skip Training the Models
-To save the reviewers' time and avoid potential inconsistency of training results across different platforms, we provide the option of using our trained models. We uploaded the trained models to Google Drive. To use the uploaded models, download the zip file `all_models.zip` [here](https://drive.google.com/file/d/1500000000000000000000000000000000000000/view?usp=sharing) and unzip it under the top directory of this repository `unzip -q all_models.zip`.
+To save the reviewers' time and avoid potential inconsistency of training results across different platforms, we provide the option of using our trained models. We uploaded the trained models to Google Drive. To use the uploaded models, download the zip file `all_models.zip` [here](https://drive.google.com/file/d/1ji3cbdqLh4uGsz0fReg1sh0deip7TMFn/view?usp=sharing) into the `src/` directory and unzip it under the `src/` directory of this repository `unzip -q all_models.zip`.
 If you downloaded the trained models, the pipeline script will automatically use the downloaded models and skip the training process.
 
 ## Experiment Set 1: Table 6 [estimated xx~xx hours if skip training, xx~xx hours if trained on CPU, and xx~xx hours if trained on GPU]
@@ -39,7 +39,7 @@ python smaller_vector_baseline.py
 ### Parse the Data and Generate the Table 6
 With the data collected, run the following command in the top directory of this repository:
 ```bash
-python parse_data.py
+python parse_results.py
 ```
 
 ## Experiment Set 2: Table 7 [estimated xx~xx hours]

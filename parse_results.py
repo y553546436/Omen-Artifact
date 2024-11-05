@@ -70,9 +70,11 @@ def shortname(trainer, dtype, dataset):
         n = 'LDC'
     n += '-'
     if dtype == 'binary':
-        n += 'BSC'
+        # n += 'BSC'
+        n += 'B'
     else:
-        n += 'MAP'
+        # n += 'MAP'
+        n += 'M'
     n += '-'
     if dataset == 'language':
         n += 'lang'
@@ -122,11 +124,10 @@ def extract_time(runtime_str):
     return float(match.group(1)) if match else None
 
 
-def parse_table(local=False):
+def parse_table(all_local=False, csv=False):
     trainers = ['OnlineHD', 'LeHDC', 'LDC']
     dtypes = ['binary', 'real']
     datasets = ['language', 'ucihar', 'isolet', 'mnist']
-    table = []
     rows = []
     for dataset in datasets:
         for trainer in trainers:
@@ -135,10 +136,9 @@ def parse_table(local=False):
                     continue
                 if dataset == 'language' and dtype == 'real':
                     continue
-                local = (trainer in ['LeHDC', 'OnlineHD'] and dtype == 'real')
+                local = all_local or (trainer in ['LeHDC', 'OnlineHD'] and dtype == 'real')
                 row = parse_row(trainer, dtype, dataset, local)
                 rows.append(row)
-                table.append(' & '.join(row) + ' \\\\\\hline')
     # parse rows to pandas dataframe
     columns =  ['Configuration', 
                 'Normal Acc', 'Normal Dim', 'Normal Time', 
@@ -230,16 +230,21 @@ def parse_table(local=False):
     mse = mean_squared_error(all_speedup.values.reshape(-1, 1), y_pred)
     print(f'Mean Squared Error: {mse:.3f}')
     # label the local time and mcutime
-    for col in rel_columns:
-        if 'Time' in col or 'Speedup' in col:
-            for i, row in rel_df.iterrows():
-                if row[col] is not None:
-                    if ('OHD' in row['Configuration'] or 'LeH' in row['Configuration']) and 'MAP' in row['Configuration']:
-                        rel_df.at[i, col] = f'\localtime{{{row[col]:.2f}}}'
-                    else:
-                        rel_df.at[i, col] = f'\mcutime{{{row[col]:.2f}}}'
+    if not csv:
+        for col in rel_columns:
+            if 'Time' in col or 'Speedup' in col:
+                for i, row in rel_df.iterrows():
+                    if row[col] is not None:
+                        if not all_local:
+                            if ('OHD' in row['Configuration'] or 'LeH' in row['Configuration']) and 'MAP' in row['Configuration']:
+                                rel_df.at[i, col] = f'\localtime{{{row[col]:.2f}}}'
+                            else:
+                                rel_df.at[i, col] = f'\mcutime{{{row[col]:.2f}}}'
+                        else:
+                            rel_df.at[i, col] = f'\localtime{{{row[col]:.2f}}}'
     # format the table for latex
-    rel_table = []
+    # rel_table = []
+    row_strs = []
     for _, row in rel_df.iterrows():
         row_str = []
         for col in rel_columns:
@@ -247,17 +252,29 @@ def parse_table(local=False):
                 row_str.append(f'{row[col]:.1f}')
             else:
                 row_str.append(f'{row[col]:.2f}' if isinstance(row[col], float) else str(row[col]))
-        rel_table.append(' & '.join(row_str) + ' \\\\\\hline')
+        # rel_table.append(' & '.join(row_str) + ' \\\\\\hline')
+        row_strs.append(row_str)
             
     # print(rel_table)
-    return rel_table
+    return row_strs
 
 
-def print_table(local=False):
-    table = parse_table(local)
-    for row in table:
-        print(row)
+def print_table(all_local=False, csv=False):
+    row_strs = parse_table(all_local, csv)
+    for row_str in row_strs:
+        if csv:
+            print(','.join(row_str))
+        else:
+            print(' & '.join(row_str) + ' \\\\\\hline')
 
 
 if __name__ == '__main__':
-    print_table()
+    import argparse
+    parser = argparse.ArgumentParser(description='Parse results and generate latex or csv table')
+    parser.add_argument('--local', action='store_true', help='Use all local time')
+    parser.add_argument('--csv', action='store_true', help='Generate csv table')
+    args = parser.parse_args()
+    if args.csv:
+        print_table(args.local, csv=True)
+    else:
+        print_table(args.local)

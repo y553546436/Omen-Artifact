@@ -68,7 +68,7 @@ def main():
                     'dim': dim
                 }
                 ep_args = convert_to_args(ep_args)
-                acc, dim = estimate_performance(ep_args, ep_args.data, ep_args.output, ep_args.dim)
+                acc, _ = estimate_performance(ep_args, ep_args.data, ep_args.output, ep_args.dim)
                 print(f'{dataset}, {trainer}, {dtype}, acc: {acc}')
                 output_file = f'output/{dataset}_{trainer}_{dtype}_sv_baseline_acc.csv'
                 with open(output_file, 'w') as f:
