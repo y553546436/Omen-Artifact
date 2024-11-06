@@ -96,7 +96,7 @@ def generate_header(args, data_dir):
         # load encoder data
         if args.dataset != 'language':
             from levelencoder import BinaryLevelEncoder
-            levelencoder = torch.load(f'{data_dir}/levelencoder.pth', map_location='cpu')
+            levelencoder = torch.load(f'{data_dir}/levelencoder.pth', map_location='cpu', weights_only=False)
             levels = levelencoder.num_level
             min_val = levelencoder.min_val
             max_val = levelencoder.max_val
@@ -108,7 +108,7 @@ def generate_header(args, data_dir):
             basis_data = bit_pack(basis_data)
         else:
             from sentenceencoder import SentenceEncoder
-            sentenceencoder: SentenceEncoder = torch.load(f'{data_dir}/sentenceencoder.pth', map_location='cpu')
+            sentenceencoder: SentenceEncoder = torch.load(f'{data_dir}/sentenceencoder.pth', map_location='cpu', weights_only=False)
             char_codebook_data = sentenceencoder.codebook.cpu().numpy()
             char_map = sentenceencoder.char_map
             assert char_codebook_data.shape == (len(char_map), dim), f'char_codebook_data shape: {char_codebook_data.shape}, expected: {(len(char_map), dim)}'

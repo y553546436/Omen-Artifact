@@ -258,7 +258,7 @@ def bipolar_to_binary(x):
 def generate_header(args, data_dir):
     model_args = pickle.load(open(f'{data_dir}/ldc_model_args.pkl', 'rb'))
     model = LDC(**model_args)
-    model.load_state_dict(torch.load(f'{data_dir}/ldc_model_state.pth', map_location=torch.device('cpu')))
+    model.load_state_dict(torch.load(f'{data_dir}/ldc_model_state.pth', map_location=torch.device('cpu'), weights_only=False))
     header = model.generate_header()
     return header
 
