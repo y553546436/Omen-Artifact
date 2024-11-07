@@ -3,6 +3,7 @@
 #include <cstring>
 #include <algorithm>
 #include <cmath>
+#include "timer.h"
 
 #ifdef BINARY
 typedef uint64_t hv_type;
@@ -143,8 +144,16 @@ void ENCODE_CHUNK(hv_type *hv_chunk, int dim_start, int dim_end) {
 
 // normal inference without omen
 void normal(uint32_t *result) {
+	uint32_t encode_time = 0;
+	uint32_t distance_time = 0;
 	dis_type dis[NUMCLASS];
+	// Encode start
+	timer_start();
 	hv_type *hv = ENCODE_ALL();
+	// Encode stop
+	encode_time = timer_stop();
+	// Distance start
+	timer_start();
 	for (int class_no = 0; class_no < NUMCLASS; class_no++) {
 		dis[class_no] = 0;
 #ifdef BLDC
@@ -170,25 +179,40 @@ void normal(uint32_t *result) {
         result[0] = std::max_element(dis, dis + NUMCLASS) - dis;
 #endif
 	}
+	// Distance stop
+	distance_time = timer_stop();
+	result[1] = encode_time;
+	result[2] = distance_time;
 	delete[] hv;
 }
 
 
 // inference with omen
 void omen(uint32_t *result) {
+	uint32_t encode_time = 0;
+	uint32_t distance_time = 0;
+	uint32_t omen_time = 0;
 	dis_type dis[NUMCLASS];
 	std::memset(dis, 0, sizeof(dis));
 	int dim_start = 0;
 	int dim_end = 0;
 #ifdef BLDC
+	// Encode init start
+	timer_start();
 	ENCODE_INIT();
+	// Encode init stop
+	encode_time += timer_stop();
 #endif
 #ifdef REAL
+	// Diff2 init start
+	timer_start();
 	dis_type diff2[NUMCLASS][NUMCLASS];
 	std::memset(diff2, 0, sizeof(diff2));
 	int diff2_computed[NUMCLASS];
 	std::memset(diff2_computed, 0, sizeof(diff2_computed));
 	hv_type hv_all[NUMDIM];
+	// Diff2 init stop
+	encode_time += timer_stop();
 #endif
 #ifdef BLDC
 	for (dim_start = 0, dim_end = FREQ; dim_start < FEATURE_HV_DIM; dim_start = dim_end, dim_end = std::min(dim_start + FREQ, FEATURE_HV_DIM))
@@ -196,8 +220,14 @@ void omen(uint32_t *result) {
 	for (dim_start = 0, dim_end = FREQ; dim_start < NUMDIM; dim_start = dim_end, dim_end = std::min(dim_start+FREQ, NUMDIM)) // FREQ should be divided by 64 for binary
 #endif
 	{
+		// Encode chunk start
+		timer_start();
 		hv_type hv_chunk[dim_end - dim_start];
 		ENCODE_CHUNK(hv_chunk, dim_start, dim_end);
+		// Encode chunk stop
+		encode_time += timer_stop();
+		// Distance start
+		timer_start();
 		for (int dim = dim_start; dim < dim_end; dim++) {
 			hv_type hv = hv_chunk[dim - dim_start];
 #ifdef REAL
@@ -215,10 +245,14 @@ void omen(uint32_t *result) {
 #endif
 			}
 		}
+		// Distance stop
+		distance_time += timer_stop();
 		// delete[] hv_chunk;
 		if (dim_end < START) {
 			continue;
 		}
+		// Omen start
+		timer_start();
 #ifdef BINARY
 		int cand = std::min_element(dis, dis + NUMCLASS) - dis;
 #else
@@ -266,7 +300,12 @@ void omen(uint32_t *result) {
 			result[1] = cand;
 			break;
 		}
+		// Omen stop
+		omen_time += timer_stop();
     }
+	result[2] = encode_time;
+	result[3] = distance_time;
+	result[4] = omen_time;
 }
 
 // inference with absolute strategy

@@ -25,6 +25,7 @@
 #include "hdc.h"
 #include "model.h"
 #include <string.h>
+#include "timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -67,7 +68,6 @@ float TEST_FEATURE[NUMFEATURE];
 uint8_t rx_buffer[BUFFER_SIZE];
 uint8_t tx_message[] = "data received\n";
 
-TIM_HandleTypeDef htim2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,37 +92,6 @@ static void MX_TIM16_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-static void MX_TIM2_Init(void);
-
-static void MX_TIM2_Init(void) {
-
-	__HAL_RCC_TIM2_CLK_ENABLE();
-
-	htim2.Instance = TIM2;
-	htim2.Init.Prescaler = 40000-1;
-	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim2.Init.Period = 0xFFFFFFFF;
-	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV4;
-	htim2.Init.RepetitionCounter = 0;
-	htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
-	if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
-	{
-		Error_Handler();
-	}
-
-}
-
-void timer_start(TIM_HandleTypeDef *htim) {
-	__HAL_TIM_SET_COUNTER(htim, 0);  // Reset the counter
-	HAL_TIM_Base_Start(htim);        // Start the timer
-}
-
-uint32_t timer_stop(TIM_HandleTypeDef *htim)
-{
-    HAL_TIM_Base_Stop(htim);         // Stop the timer
-    return __HAL_TIM_GET_COUNTER(htim);  // Get the counter value
-}
 
 /* USER CODE END 0 */
 
@@ -994,32 +963,32 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	{
 	    if (huart->Instance == USART1)
 	    {
-          uint32_t results[14];
+          uint32_t results[17];
 	        // Copy received data to the 2D float array
 	        memcpy(TEST_FEATURE, rx_buffer, BUFFER_SIZE);
 
-	        timer_start(&htim2);
+	        // timer_start();
 	        normal(&results[0]);
-	        results[1] = timer_stop(&htim2);
+	        // results[1] = timer_stop();
 
-          timer_start(&htim2);
-          omen(&results[2]);
-          results[4] = timer_stop(&htim2);
+          // timer_start();
+          omen(&results[3]);
+          // results[4] = timer_stop();
 
 #ifdef HEURISTICS
-          timer_start(&htim2);
-          absolute(&results[5]);
-          results[7] = timer_stop(&htim2);
+          timer_start();
+          absolute(&results[8]);
+          results[10] = timer_stop();
 
-          timer_start(&htim2);
-          diff(&results[8]);
-          results[10] = timer_stop(&htim2);
+          timer_start();
+          diff(&results[11]);
+          results[13] = timer_stop();
 
-          timer_start(&htim2);
-          mean_strategy(&results[11]);
-          results[13] = timer_stop(&htim2);
+          timer_start();
+          mean_strategy(&results[14]);
+          results[16] = timer_stop();
 #else
-          memset(&results[5], 0, 9 * sizeof(uint32_t));
+          memset(&results[8], 0, 9 * sizeof(uint32_t));
 #endif
 
           // uart_buf_len = sprintf(uart_buf, "%d %d %d %lu %lu\n", result[0], result[1], normal_result, timer_val[1], timer_val[0]);

@@ -51,12 +51,12 @@ $(testset_target): src/$(DATASET).py
 
 build: header
 	@echo "Building firmware..."
-	@cd mcu-server && ./build.sh
+	@cd mcu-server && ./build_breakdown.sh
 	@echo "Done!"
 
 clean:
 	@echo "Cleaning..."
-	@rm -rf $(train_target) $(header_target) $(testset_target) firmware/Debug firmware/Release $(final_target)
+	@rm -rf $(train_target) $(header_target) $(testset_target) firmware_breakdown/Debug firmware_breakdown/Release $(final_target)
 	@echo "Done!"
 
 run: build $(testset_target)
