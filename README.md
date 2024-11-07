@@ -49,7 +49,13 @@ unzip -q local-output.zip
 
 #### [Option 2] Use Our MCU Experiment Data, Collect Local Data
 
-Run the following command in the top directory of this repository. This command will (1) train the models (automatically skipped if you used our trained models) (2) generate inference C++ code for local experiments and (3) collect the runtime data on local machines:
+Unzip our MCU data with the following command:
+
+```bash
+unzip -q mcu-output.zip
+```
+
+Then run the following command in the top directory of this repository. This command will (1) train the models (automatically skipped if you used our trained models) (2) generate inference C++ code for local experiments and (3) collect the runtime data on local machines:
 
 ```bash
 python local_pipeline.py
