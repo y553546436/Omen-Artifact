@@ -46,7 +46,7 @@ def generate_configs():
     # return a list of commands
     commands = []
     datasets = ['language', 'ucihar', 'isolet', 'mnist']
-    trainers = ['LeHDC', 'OnlineHD']
+    trainers = ['LeHDC', 'OnlineHD', 'LDC']
     dtypes = ['real', 'binary']
     alphas = ['0.01', '0.05', '0.10']
     strategies = ['linear']

@@ -3,14 +3,13 @@ from src.partial import load_and_test
 from src.estimate_perf import estimate_performance
 
 
-mcu_dir = 'mcu-output'
 local_dir = 'output'
 
 
-def get_omen_dim(dataset, trainer, dtype, local):
+def get_omen_dim(dataset, trainer, dtype):
     start = ('512' if dtype == 'binary' else '128') if trainer in ['LeHDC', 'OnlineHD'] else '16'
     freq = '64' if trainer in ['LeHDC', 'OnlineHD'] else '4'
-    omen_file = f'{local_dir if local else mcu_dir}/{dataset}_{trainer}_{dtype}_linear_s{start}_f{freq}_a005.csv'
+    omen_file = f'{local_dir}/{dataset}_{trainer}_{dtype}_linear_s{start}_f{freq}_a005.csv'
     bit_packed = (dtype == 'binary' and trainer != 'LDC')
     omen_data = load_csv(omen_file, bit_packed=bit_packed)
     return int(omen_data['omen_dim'])
@@ -41,8 +40,7 @@ def main():
                     continue
                 if dataset == 'language' and dtype == 'real':
                     continue
-                local = (trainer in ['LeHDC', 'OnlineHD'] and dtype == 'real')
-                omen_dim = get_omen_dim(dataset, trainer, dtype, local)
+                omen_dim = get_omen_dim(dataset, trainer, dtype)
                 print(f'{dataset}, {trainer}, {dtype}, dim: {omen_dim}')
                 partial_args = {
                     'dataset': dataset,

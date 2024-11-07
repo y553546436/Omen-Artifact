@@ -236,7 +236,7 @@ def parse_table(all_local=False, csv=False):
                 for i, row in rel_df.iterrows():
                     if row[col] is not None:
                         if not all_local:
-                            if ('OHD' in row['Configuration'] or 'LeH' in row['Configuration']) and 'MAP' in row['Configuration']:
+                            if ('OHD' in row['Configuration'] or 'LeH' in row['Configuration']) and '-M-' in row['Configuration']:
                                 rel_df.at[i, col] = f'\localtime{{{row[col]:.2f}}}'
                             else:
                                 rel_df.at[i, col] = f'\mcutime{{{row[col]:.2f}}}'
