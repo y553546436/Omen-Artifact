@@ -20,12 +20,14 @@ alpha_filename := $(if $(ALPHA),a$(subst .,,$(ALPHA)))
 
 
 mcu_result := $(DATASET)_$(TRAINER)_$(DTYPE)_$(STRATEGY)_$(start_filename)_$(freq_filename)_$(alpha_filename).csv
-final_target := mcu-server/$(mcu_result)
+final_target := mcu-output/$(mcu_result)
 
 all: $(final_target)
 
 $(final_target):
+	@mkdir -p mcu-output
 	@make run
+	@mv mcu-server/$(mcu_result) $(final_target)
 
 $(train_target):
 	@echo "Training $(DTYPE) $(TRAINER) model on $(DATASET) dataset..."
