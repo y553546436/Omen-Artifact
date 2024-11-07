@@ -21,7 +21,7 @@ COPY --from=python /omen/venv /omen/venv
 
 # install build dependencies gcc and g++
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
+    build-essential unzip \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PATH="/omen/venv/bin:$PATH"

@@ -1,10 +1,10 @@
-FROM nvidia/cuda:12.6-runtime-ubuntu24.04
+FROM nvidia/cuda:12.6.2-runtime-ubuntu24.04
 
 RUN apt-get update && \
-    apt-get install -y build-essential software-properties-common && \
+    apt-get install -y build-essential software-properties-common unzip && \
     add-apt-repository -y ppa:deadsnakes/ppa && \
     apt-get update && \
-    apt install -y python3.11 python3.11-venv && \
+    apt-get install -y python3.11 python3.11-venv && \
     rm -rf /var/lib/apt/lists/*
 
 RUN python3.11 -m venv /omen/venv
