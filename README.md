@@ -6,7 +6,19 @@ The artifact includes code and scripts to reproduce the experiments and tables i
 ## Requirements
 We provide the Docker configuration file for the artifact.
 Docker installation instructions can be found [here](https://docs.docker.com/get-docker/).
+### [Option 1] CPU-only Docker Image
 To build the Docker image, run `docker build -t artifact .` in the top directory of this repository.
+Then run the following command to start the container:
+```bash
+docker run -it --rm -v .:/omen/workspace artifact /bin/bash
+```
+
+### [Option 2] CUDA-enabled Docker Image
+If you want to use CUDA for training, first install the NVIDIA Container Toolkit following [this instruction](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/install-guide.html). [configure docker to use gpu].Then build the Docker image by running `docker build -f cuda.dockerfile -t artifact .` in the top directory of this repository.
+Then run the following command to start the container:
+```bash
+docker run -it --rm -v .:/omen/workspace --gpus all artifact /bin/bash
+```
 
 ## [Optional] Skip Training the Models
 To save the reviewers' time and avoid potential inconsistency of training results across different platforms, we provide the option of using our trained models. We uploaded the trained models to Google Drive. To use the uploaded models, download the zip file `all_models.zip` [here](https://drive.google.com/file/d/1ji3cbdqLh4uGsz0fReg1sh0deip7TMFn/view?usp=sharing) into the `src/` directory and unzip it under the `src/` directory of this repository `unzip -q all_models.zip`.
