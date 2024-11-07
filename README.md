@@ -1,6 +1,7 @@
 # Omen Artifact
 
 This repository contains the artifact for the ASPLOS 2025 paper "Early Termination for Hyperdimensional Computing Using Inferential Statistics".
+The latest version of the paper is included in the artifact as `paper.pdf`.
 The artifact includes code and scripts to reproduce the experiments and tables in the paper. The experiments are divided into three sets, each corresponding to one table in the paper. Please run the experiments in the order of Experiment Set 1, Experiment Set 2, and Experiment Set 3, due to the dependency of the experiments (e.g., Experiment Set 2 and Experiment Set 3 require the trained models from Experiment Set 1).
 
 ## Requirements
