@@ -1,11 +1,18 @@
-FROM nvidia/cuda:12.6.2-runtime-ubuntu24.04
+FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y build-essential software-properties-common unzip && \
-    add-apt-repository -y ppa:deadsnakes/ppa && \
-    apt-get update && \
-    apt-get install -y python3.11 python3.11-venv && \
-    rm -rf /var/lib/apt/lists/*
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        software-properties-common \
+        unzip \
+    && add-apt-repository -y ppa:deadsnakes/ppa \
+    && apt-get update && \
+    apt-get install -y --no-install-recommends \
+        python3.11 \
+        python3.11-venv \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN python3.11 -m venv /omen/venv
 
