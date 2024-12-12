@@ -216,6 +216,11 @@ def generate_header(args, data_dir):
         preambles += '#define HEURISTICS\n'
 
     header_content = preambles + header_template.substitute(data_mapping)
+
+    if args.cutoff is not None:
+        header_content += f'#define CUTOFF {args.cutoff}\n'
+        print('CUTOFF', args.cutoff)
+    
     with open(f'{args.header}', 'w') as f:
         f.write(header_content)
     print('Header file generated at', args.header)
@@ -233,6 +238,7 @@ if __name__ == '__main__':
     parser.add_argument('--start', type=str, help='First dimension Omen conducts a test')
     parser.add_argument('--freq', type=str, help='Interval between two consecutive tests (linear), or ratio between two consecutive tests (exponential)')
     parser.add_argument('--BLDC', help='Use BLDC', action='store_true')
+    parser.add_argument('--cutoff', type=int, help='Cutoff dimension for smaller vector baseline')
     args = parser.parse_args()
     if args.dataset == 'language' and not args.binary:
         raise ValueError('Language dataset must use binary hypervectors')

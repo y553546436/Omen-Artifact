@@ -150,11 +150,15 @@ void normal(uint32_t *result) {
 	hv_type *hv = ENCODE_ALL();
 	for (int class_no = 0; class_no < NUMCLASS; class_no++) {
 		dis[class_no] = 0;
+#ifdef CUTOFF
+        for (int dim = 0; dim < CUTOFF; dim++)
+#else
 #ifdef BLDC
 		for (int dim = 0; dim < FEATURE_HV_DIM; dim++)
 #else
 		for (int dim = 0; dim < NUMDIM; dim++)
 #endif
+#endif // CUTOFF
 		{
 #ifdef BLDC
 			dis[class_no] += hv[dim] ^ class_layer_weight[dim][class_no];
