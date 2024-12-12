@@ -4,6 +4,8 @@ import argparse
 import serial
 from rich.console import Console
 
+from smaller_vector_baseline import get_omen_dim
+
 console = Console()
 
 parser = argparse.ArgumentParser(description='Run Omen experiments')
@@ -38,7 +40,7 @@ def trainer_args(trainer, dtype):
 
 
 def make_command(dataset, dtype, trainer, start, freq, alpha, strategy, device):
-    cmd = f'make DATASET={dataset} DTYPE={dtype} TRAINER={trainer} TRAINER_ARGS={trainer_args(trainer, dtype)} START={start} FREQ={freq} ALPHA={alpha} STRATEGY={strategy} DEVICE={device}'
+    cmd = f'make -f sv.mk DATASET={dataset} DTYPE={dtype} TRAINER={trainer} TRAINER_ARGS={trainer_args(trainer, dtype)} START={start} FREQ={freq} ALPHA={alpha} STRATEGY={strategy} CUTOFF={get_omen_dim(dataset, trainer, dtype)} DEVICE={device}'
     return cmd
 
 
