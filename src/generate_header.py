@@ -218,7 +218,10 @@ def generate_header(args, data_dir):
     header_content = preambles + header_template.substitute(data_mapping)
 
     if args.cutoff is not None:
-        header_content += f'#define CUTOFF {args.cutoff}\n'
+        if args.binary:
+            header_content += f'#define CUTOFF {math.ceil(dim/64)}\n'
+        else:
+            header_content += f'#define CUTOFF {args.cutoff}\n'
         print('CUTOFF', args.cutoff)
     
     with open(f'{args.header}', 'w') as f:

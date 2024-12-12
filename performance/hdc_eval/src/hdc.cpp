@@ -68,10 +68,17 @@ hv_type ENCODE(int dim) {
 // encode all dimensions of a test
 hv_type *ENCODE_ALL() {
     ENCODE_INIT();
+#ifdef CUTOFF
+    hv_type *hv = new hv_type[CUTOFF];
+    for (int i = 0; i < CUTOFF; i++) {
+        hv[i] = ENCODE(i);
+    }
+#else
     hv_type *hv = new hv_type[FEATURE_HV_DIM];
     for (int i = 0; i < FEATURE_HV_DIM; i++) {
         hv[i] = ENCODE(i);
     }
+#endif // CUTOFF
     return hv;
 }
 
@@ -128,10 +135,17 @@ hv_type ENCODE(int dim) {
 
 // encode all dimensions of a test
 hv_type *ENCODE_ALL() {
+#ifdef CUTOFF
+    hv_type *hv = new hv_type[CUTOFF];
+    for (int dim = 0; dim < CUTOFF; dim++) {
+        hv[dim] = ENCODE(dim);
+    }
+#else
     hv_type *hv = new hv_type[NUMDIM];
     for (int dim = 0; dim < NUMDIM; dim++) {
         hv[dim] = ENCODE(dim);
     }
+#endif // CUTOFF
     return hv;
 }
 
