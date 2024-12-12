@@ -26,7 +26,7 @@ all: $(final_target)
 
 $(final_target):
 	@mkdir -p mcu-output_sv
-	@make run
+	@make -f sv.mk run
 	@mv mcu-server/$(mcu_result) $(final_target)
 
 $(train_target):
