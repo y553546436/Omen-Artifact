@@ -50,7 +50,7 @@ def generate_configs():
     datasets = ['language', 'ucihar', 'isolet', 'mnist']
     trainers = ['LeHDC', 'OnlineHD', 'LDC']
     dtypes = ['real', 'binary']
-    alphas = ['0.01', '0.05', '0.10']
+    alphas = ['0.10']
     strategies = ['linear']
     for trainer in trainers:
         for dataset in datasets:

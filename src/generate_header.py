@@ -258,6 +258,9 @@ if __name__ == '__main__':
         define = '#define BLDC\n'
         if args.alpha == '0.01':
             define += '#define HEURISTICS\n'
+        if args.cutoff is not None:
+            define += f'#define CUTOFF {args.cutoff}\n'
+            print('CUTOFF', args.cutoff)
         omen_header = generate_omen_header(args, args.data)
         ldc_header = generate_ldc_header(args, args.data)
         with open(args.header, 'w') as f:

@@ -19,7 +19,7 @@ freq_filename := $(if $(FREQ),f$(FREQ))
 alpha_filename := $(if $(ALPHA),a$(subst .,,$(ALPHA)))
 
 
-mcu_result := sv_$(CUTOFF)_$(DATASET)_$(TRAINER)_$(DTYPE)_$(STRATEGY)_$(start_filename)_$(freq_filename)_$(alpha_filename).csv
+mcu_result := sv_$(DATASET)_$(TRAINER)_$(DTYPE)_$(STRATEGY)_$(start_filename)_$(freq_filename)_$(alpha_filename).csv
 final_target := mcu-output_sv/$(mcu_result)
 
 all: $(final_target)

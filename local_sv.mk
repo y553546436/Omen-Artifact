@@ -17,7 +17,7 @@ freq_filename := $(if $(FREQ),f$(FREQ))
 alpha_filename := $(if $(ALPHA),a$(subst .,,$(ALPHA)))
 
 
-result := sv_$(CUTOFF)_$(DATASET)_$(TRAINER)_$(DTYPE)_$(STRATEGY)_$(start_filename)_$(freq_filename)_$(alpha_filename).csv
+result := sv_$(DATASET)_$(TRAINER)_$(DTYPE)_$(STRATEGY)_$(start_filename)_$(freq_filename)_$(alpha_filename).csv
 final_target := output_sv/$(result)
 
 all: $(final_target)
