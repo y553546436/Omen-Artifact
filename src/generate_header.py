@@ -219,7 +219,7 @@ def generate_header(args, data_dir):
 
     if args.cutoff is not None:
         if args.binary:
-            header_content += f'#define CUTOFF {math.ceil(dim/64)}\n'
+            header_content += f'#define CUTOFF {math.ceil(args.cutoff/64)}\n'
         else:
             header_content += f'#define CUTOFF {args.cutoff}\n'
         print('CUTOFF', args.cutoff)
