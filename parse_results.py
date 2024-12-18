@@ -106,7 +106,7 @@ def parse_row(trainer, dtype, dataset, local=False):
     results = [load_csv(file, bit_packed=bit_packed) for file in files]
     # with open(f'{local_dir}/{dataset}_{trainer}_{dtype}_sv_baseline_acc.csv', 'r') as f:
     #     sv_baseline_acc = float(f.read()) * 100
-    sv_file = f'{local_dir if local else mcu_dir}/sv_{dataset}_{trainer}_{dtype}_linear_s{start}_f{freq}_a001.csv'
+    sv_file = f'{local_dir if local else mcu_dir}/sv_{dataset}_{trainer}_{dtype}_linear_s{start}_f{freq}_a010.csv'
     sv_result = load_csv(sv_file, bit_packed=bit_packed)
     timedec = localtime if local else mcutime
     row = [shortname(trainer, dtype, dataset), 
@@ -268,6 +268,11 @@ def parse_table(all_local=False, csv=False):
 
 def print_table(all_local=False, csv=False):
     row_strs = parse_table(all_local, csv)
+    header = ['Benchmark', 'Unoptimized Acc', 'Unoptimized Dim', 'Unoptimized Time', 'Omen Acc Loss(a=0.01)', 'Omen Dim Reduction(a=0.01)', 'Omen Speedup(a=0.01)', 'Omen Acc Loss(a=0.05)', 'Omen Dim Reduction(a=0.05)', 'Omen Speedup(a=0.05)', 'SV Baseline Acc Loss', 'SV Baseline Speedup', 'Omen Acc Loss(a=0.10)', 'Omen Dim Reduction(a=0.10)', 'Omen Speedup(a=0.10)', 'Diff Acc Loss', 'Diff Dim Reduction', 'Diff Speedup', 'Absolute Acc Loss', 'Absolute Dim Reduction', 'Absolute Speedup', 'Mean Acc Loss', 'Mean Dim Reduction', 'Mean Speedup']
+    if csv:
+        print(','.join(header))
+    else:
+        print(' & '.join(header) + ' \\\\\\hline')
     for row_str in row_strs:
         if csv:
             print(','.join(row_str))
