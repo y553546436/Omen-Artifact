@@ -72,8 +72,20 @@ def main():
                 partial_args = deepcopy(partial_args_template)
                 partial_args['alpha'] = alpha
                 acc, dim_used = get_acc_dim(partial_args, ep_args_template)
+                if alpha == 0.05:
+                    omen_dim = int(dim_used)
                 output.append(str(acc))
                 output.append(str(dim_used))
+            # sv baseline
+            partial_args = deepcopy(partial_args_template)
+            partial_args['strategy'] = 'cutoff'
+            partial_args['cutoff'] = omen_dim
+            ep_args = deepcopy(ep_args_template)
+            ep_args['strategy'] = 'onetime'
+            ep_args['start'] = omen_dim
+            acc, dim_used = get_acc_dim(partial_args, ep_args)
+            output.append(str(acc))
+            output.append(str(dim_used))
             # diff, absolute, mean
             for strategy in ['diff', 'absolute', 'mean']:
                 partial_args = deepcopy(partial_args_template)

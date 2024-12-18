@@ -1002,6 +1002,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	        normal(&results[0]);
 	        results[1] = timer_stop(&htim2);
 
+#ifdef CUTOFF
+          memset(&results[2], 0, 12 * sizeof(uint32_t));
+#else
           timer_start(&htim2);
           omen(&results[2]);
           results[4] = timer_stop(&htim2);
@@ -1021,6 +1024,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 #else
           memset(&results[5], 0, 9 * sizeof(uint32_t));
 #endif
+
+#endif // CUTOFF
 
           // uart_buf_len = sprintf(uart_buf, "%d %d %d %lu %lu\n", result[0], result[1], normal_result, timer_val[1], timer_val[0]);
           // HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, uart_buf_len, 100);

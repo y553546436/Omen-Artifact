@@ -65,10 +65,17 @@ hv_type ENCODE(int dim) {
 // encode all dimensions of a test
 hv_type *ENCODE_ALL() {
     ENCODE_INIT();
+#ifdef CUTOFF
+	hv_type *hv = new hv_type[CUTOFF];
+    for (int i = 0; i < CUTOFF; i++) {
+        hv[i] = ENCODE(i);
+    }
+#else
     hv_type *hv = new hv_type[FEATURE_HV_DIM];
     for (int i = 0; i < FEATURE_HV_DIM; i++) {
         hv[i] = ENCODE(i);
     }
+#endif // CUTOFF
     return hv;
 }
 
@@ -125,10 +132,17 @@ hv_type ENCODE(int dim) {
 
 // encode all dimensions of a test
 hv_type *ENCODE_ALL() {
+#ifdef CUTOFF
+	hv_type *hv = new hv_type[CUTOFF];
+    for (int dim = 0; dim < CUTOFF; dim++) {
+        hv[dim] = ENCODE(dim);
+    }
+#else
     hv_type *hv = new hv_type[NUMDIM];
     for (int dim = 0; dim < NUMDIM; dim++) {
         hv[dim] = ENCODE(dim);
     }
+#endif // CUTOFF
     return hv;
 }
 
@@ -147,11 +161,15 @@ void normal(uint32_t *result) {
 	hv_type *hv = ENCODE_ALL();
 	for (int class_no = 0; class_no < NUMCLASS; class_no++) {
 		dis[class_no] = 0;
+#ifdef CUTOFF
+		for (int dim = 0; dim < CUTOFF; dim++)
+#else
 #ifdef BLDC
 		for (int dim = 0; dim < FEATURE_HV_DIM; dim++)
 #else
 		for (int dim = 0; dim < NUMDIM; dim++)
 #endif
+#endif // CUTOFF
 		{
 #ifdef BLDC
 			dis[class_no] += hv[dim] ^ class_layer_weight[dim][class_no];

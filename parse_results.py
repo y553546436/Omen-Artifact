@@ -104,13 +104,16 @@ def parse_row(trainer, dtype, dataset, local=False):
     else:
         dim = 256
     results = [load_csv(file, bit_packed=bit_packed) for file in files]
-    with open(f'{local_dir}/{dataset}_{trainer}_{dtype}_sv_baseline_acc.csv', 'r') as f:
-        sv_baseline_acc = float(f.read()) * 100
+    # with open(f'{local_dir}/{dataset}_{trainer}_{dtype}_sv_baseline_acc.csv', 'r') as f:
+    #     sv_baseline_acc = float(f.read()) * 100
+    sv_file = f'{local_dir if local else mcu_dir}/sv_{dataset}_{trainer}_{dtype}_linear_s{start}_f{freq}_a010.csv'
+    sv_result = load_csv(sv_file, bit_packed=bit_packed)
     timedec = localtime if local else mcutime
     row = [shortname(trainer, dtype, dataset), 
            f'{results[0]["normal_acc"]:.1f}', f'{dim:.0f}', timedec(results[0]["normal_time"]), 
            f'{results[0]["omen_acc"]:.1f}', f'{results[0]["omen_dim"]:.0f}', timedec(results[0]["omen_time"]), 
-           f'{results[1]["omen_acc"]:.1f}', f'{results[1]["omen_dim"]:.0f}', timedec(results[1]["omen_time"]), f'{sv_baseline_acc:.1f}',
+           f'{results[1]["omen_acc"]:.1f}', f'{results[1]["omen_dim"]:.0f}', timedec(results[1]["omen_time"]), #f'{sv_baseline_acc:.1f}',
+           f'{sv_result["normal_acc"]:.1f}', timedec(sv_result["normal_time"]),
            f'{results[2]["omen_acc"]:.1f}', f'{results[2]["omen_dim"]:.0f}', timedec(results[2]["omen_time"]), 
            f'{results[0]["diff_acc"]:.1f}', f'{results[0]["diff_dim"]:.0f}', timedec(results[0]["diff_time"]), 
            f'{results[0]["absolute_acc"]:.1f}', f'{results[0]["absolute_dim"]:.0f}', timedec(results[0]["absolute_time"]), 
@@ -143,7 +146,8 @@ def parse_table(all_local=False, csv=False):
     columns =  ['Configuration', 
                 'Normal Acc', 'Normal Dim', 'Normal Time', 
                 'Omen Acc(a=0.01)', 'Omen Dim(a=0.01)', 'Omen Time(a=0.01)',
-                'Omen Acc(a=0.05)', 'Omen Dim(a=0.05)', 'Omen Time(a=0.05)', 'SV Baseline Acc',
+                'Omen Acc(a=0.05)', 'Omen Dim(a=0.05)', 'Omen Time(a=0.05)', #'SV Baseline Acc',
+                'SV Baseline Acc', 'SV Baseline Time',
                 'Omen Acc(a=0.10)', 'Omen Dim(a=0.10)', 'Omen Time(a=0.10)',
                 'Diff Acc', 'Diff Dim', 'Diff Time',
                 'Absolute Acc', 'Absolute Dim', 'Absolute Time',
@@ -157,6 +161,7 @@ def parse_table(all_local=False, csv=False):
     df['Diff Time'] = df['Diff Time'].apply(extract_time)
     df['Absolute Time'] = df['Absolute Time'].apply(extract_time)
     df['Mean Time'] = df['Mean Time'].apply(extract_time)
+    df['SV Baseline Time'] = df['SV Baseline Time'].apply(extract_time)
     print(df)
     df[columns[1:]] = df[columns[1:]].apply(pd.to_numeric)
     # calculate stats
@@ -181,6 +186,7 @@ def parse_table(all_local=False, csv=False):
     df['Diff Speedup'] = df['Normal Time'] / df['Diff Time']
     df['Absolute Speedup'] = df['Normal Time'] / df['Absolute Time']
     df['Mean Speedup'] = df['Normal Time'] / df['Mean Time']
+    df['SV Baseline Speedup'] = df['Normal Time'] / df['SV Baseline Time']
     print(df)
     # calculate min, max for stats
     stats = df.describe().loc[['min', 'max']]
@@ -190,7 +196,8 @@ def parse_table(all_local=False, csv=False):
     rel_columns = ['Configuration',
                     'Normal Acc', 'Normal Dim', 'Normal Time',
                     'Omen Acc Drop(a=0.01)', 'Omen Dim Reduction(a=0.01)', 'Omen Speedup(a=0.01)',
-                    'Omen Acc Drop(a=0.05)', 'Omen Dim Reduction(a=0.05)', 'Omen Speedup(a=0.05)', 'SV Baseline Acc Drop',
+                    'Omen Acc Drop(a=0.05)', 'Omen Dim Reduction(a=0.05)', 'Omen Speedup(a=0.05)', # 'SV Baseline Acc Drop',
+                    'SV Baseline Acc Drop', 'SV Baseline Speedup',
                     'Omen Acc Drop(a=0.10)', 'Omen Dim Reduction(a=0.10)', 'Omen Speedup(a=0.10)',
                     'Diff Acc Drop', 'Diff Dim Reduction', 'Diff Speedup',
                     'Absolute Acc Drop', 'Absolute Dim Reduction', 'Absolute Speedup',
@@ -261,6 +268,11 @@ def parse_table(all_local=False, csv=False):
 
 def print_table(all_local=False, csv=False):
     row_strs = parse_table(all_local, csv)
+    header = ['Benchmark', 'Unoptimized Acc', 'Unoptimized Dim', 'Unoptimized Time', 'Omen Acc Loss(a=0.01)', 'Omen Dim Reduction(a=0.01)', 'Omen Speedup(a=0.01)', 'Omen Acc Loss(a=0.05)', 'Omen Dim Reduction(a=0.05)', 'Omen Speedup(a=0.05)', 'SV Baseline Acc Loss', 'SV Baseline Speedup', 'Omen Acc Loss(a=0.10)', 'Omen Dim Reduction(a=0.10)', 'Omen Speedup(a=0.10)', 'Diff Acc Loss', 'Diff Dim Reduction', 'Diff Speedup', 'Absolute Acc Loss', 'Absolute Dim Reduction', 'Absolute Speedup', 'Mean Acc Loss', 'Mean Dim Reduction', 'Mean Speedup']
+    if csv:
+        print(','.join(header))
+    else:
+        print(' & '.join(header) + ' \\\\\\hline')
     for row_str in row_strs:
         if csv:
             print(','.join(row_str))
